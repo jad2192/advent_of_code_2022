@@ -14,11 +14,11 @@ def load_elf_data() -> List[List[int]]:
     return res
 
 
-def get_max_cal_elf() -> int:
-    """Part Solve Part 1"""
-    elf_data = load_elf_data()
-    return sum(sorted(elf_data, key=lambda elf: sum(elf))[-1])
+def get_max_cal_elves(top_k: int) -> int:
+    """Part Solve Part 1 / 2, sum calories of the top K-th elves carrying the most Calories."""
+    sorted_elf_data = sorted(load_elf_data(), key=lambda elf: -sum(elf))
+    return sum([sum(elf) for elf in sorted_elf_data[:top_k]])
 
 
-def test_day1_part1():
-    assert get_max_cal_elf() == 68292
+assert get_max_cal_elves(1) == 68292
+assert get_max_cal_elves(3) == 203203
