@@ -41,7 +41,7 @@ What would your total score be if everything goes exactly according to your stra
 
 """
 
-from typing import List, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 
 def load_strategy_guide() -> List[str]:
@@ -67,4 +67,24 @@ def get_my_total() -> int:
     return sum([round_score(match) for match in match_rounds])
 
 
-assert get_my_total() == 15572
+# Part 2
+WIN_D_PT2: Dict[str, str] = {"A": "B", "B": "C", "C": "A"}
+LOSE_D_PT2: Dict[str, str] = {val: key for key, val in WIN_D_PT2.items()}
+
+
+def alter_round(match_round: str) -> str:
+    """X - lose, Y - draw, Z - win"""
+    elf, me = match_round[0], match_round[-1]
+    if me == "X":
+        return f"{elf} {LOSE_D_PT2[elf]}"
+    elif me == "Y":
+        return f"{elf} {elf}"
+    else:
+        return f"{elf} {WIN_D_PT2[elf]}"
+
+def get_my_total_pt2() -> int:
+    altered_rounds = [alter_round(round) for round in load_strategy_guide()]
+    return sum([round_score(match) for match in altered_rounds])
+
+print("Part 1: ", get_my_total())
+print("Part 2: ", get_my_total_pt2())
