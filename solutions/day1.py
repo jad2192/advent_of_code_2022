@@ -69,5 +69,5 @@ def get_max_cal_elves(top_k: int) -> int:
     return sum([sum(elf) for elf in sorted_elf_data[:top_k]])
 
 
-assert get_max_cal_elves(1) == 68292
-assert get_max_cal_elves(3) == 203203
+print("Part 1: ", get_max_cal_elves(1))
+print("Part 2: ", get_max_cal_elves(3))
