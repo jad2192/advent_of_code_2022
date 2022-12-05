@@ -13,16 +13,14 @@ def get_priority(item: str) -> int:
 def get_part_1() -> int:
     load_outs = get_input()
     return sum(
-        get_priority(next(iter(set(pack[0][: pack[1]]).intersection(set(pack[0][pack[1] :]))))) for pack in load_outs
+        get_priority((set(pack[0][: pack[1]]).intersection(set(pack[0][pack[1] :]))).pop()) for pack in load_outs
     )
 
 
 def get_part_2() -> int:
     load_outs = get_input()
     elf_loads = [[elf[0] for elf in load_outs[k : k + 3]] for k in range(0, len(load_outs), 3)]
-    return sum(
-        get_priority(next(iter(reduce(set.intersection, [set(elf) for elf in elf_load])))) for elf_load in elf_loads
-    )
+    return sum(get_priority(reduce(set.intersection, [set(elf) for elf in elf_load]).pop()) for elf_load in elf_loads)
 
 
 print("Part 1: ", get_part_1())
