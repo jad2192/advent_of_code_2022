@@ -1,10 +1,11 @@
 from collections import defaultdict
 from queue import PriorityQueue
-from typing import DefaultDict, Dict, List, Literal, NamedTuple, Set
+from typing import DefaultDict, Dict, List, Literal, NamedTuple, Optional, Set
 
 
 class FileSystemObject(NamedTuple):
     type: Literal["dir", "file"]
+    parent: Optional["FileSystemObject"]
     path: List[str]
     size: int = 0
 
@@ -13,7 +14,7 @@ class FileSystemObject(NamedTuple):
 
 
 def create_file_tree(terminal_list: List[str]) -> List[FileSystemObject]:
-    tree: Dict[str, FileSystemObject] = {"..": FileSystemObject(type="dir", path=[".."])}
+    tree: Dict[str, FileSystemObject] = {"..": FileSystemObject(type="dir", path=[".."], parent=None)}
     cwd: FileSystemObject = tree[".."]
     for line in terminal_list:
         match line.split():
@@ -24,10 +25,10 @@ def create_file_tree(terminal_list: List[str]) -> List[FileSystemObject]:
             case ["$", "cd", directory]:
                 cwd = tree[f"{cwd.path_str()}/{directory}"]
             case ["dir", directory]:
-                new_obj = FileSystemObject(type="dir", path=cwd.path.copy() + [directory])
+                new_obj = FileSystemObject(type="dir", path=cwd.path.copy() + [directory], parent=cwd)
                 tree[new_obj.path_str()] = new_obj
             case [bytes, file] if bytes.isdigit():
-                new_obj = FileSystemObject(type="file", path=cwd.path.copy() + [file], size=int(bytes))
+                new_obj = FileSystemObject(type="file", path=cwd.path.copy() + [file], size=int(bytes), parent=cwd)
                 tree[new_obj.path_str()] = new_obj
     return list(tree.values())
 
@@ -38,7 +39,6 @@ def get_directory_sizes_dfs(terminal_list: List[str]) -> List[int]:
     for file in [obj for obj in file_tree if obj.type == "file"]:
         for k in range(len(file.path)):
             directory_sizes[file.path_str(levels_up=k)] += file.size
-    assert sum(obj.size for obj in file_tree if obj.type == "file") == directory_sizes[".."]
     return [directory_sizes[obj.path_str()] for obj in file_tree if obj.type == "dir"]
 
 
@@ -52,12 +52,10 @@ def get_directory_sizes_bfs(terminal_list: List[str]) -> List[int]:
         directory_sizes[file.path_str()] += file.size
     while not pqueue.empty():
         cur_priority, cur_obj = pqueue.get()
-        if cur_obj.path != [".."] and cur_obj.path_str() not in seen_obj:
-            parent = [obj for obj in file_tree if obj.path_str() == cur_obj.path_str(levels_up=1)][0]
-            pqueue.put((cur_priority + 1, parent))
-            directory_sizes[cur_obj.path_str(levels_up=1)] += directory_sizes[cur_obj.path_str()]
+        if cur_obj.parent != None and cur_obj.path_str() not in seen_obj:
+            pqueue.put((cur_priority + 1, cur_obj.parent))
+            directory_sizes[cur_obj.parent.path_str()] += directory_sizes[cur_obj.path_str()]
         seen_obj.add(cur_obj.path_str())
-    assert sum(obj.size for obj in file_tree if obj.type == "file") == directory_sizes[".."]
     return [directory_sizes[obj.path_str()] for obj in file_tree if obj.type == "dir"]
 
 
