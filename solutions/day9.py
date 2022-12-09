@@ -1,8 +1,6 @@
-from collections import defaultdict
-from typing import DefaultDict, List, Literal, Tuple, TypeAlias
+from typing import List, Literal, Set, Tuple, TypeAlias
 
 Coord: TypeAlias = Tuple[int, int]  # Coordinate class
-CoordMap: TypeAlias = DefaultDict[Coord, int]
 CoordUpdate: TypeAlias = Literal[-1, 0, 1]
 
 
@@ -32,33 +30,29 @@ def propogate_motion(coords: List[Coord], head_x: CoordUpdate, head_y: CoordUpda
     return coords
 
 
-def simulate_motion(head_motions: List[str], num_knots: int = 2) -> CoordMap:
-    coord_map_tail: CoordMap = defaultdict(int)
+def simulate_motion(head_motions: List[str], num_knots: int = 2) -> Set[Coord]:
+    tail_seen: Set[Coord] = {(0, 0)}
     cur_coords: List[Coord] = [(0, 0)] * num_knots
-    coord_map_tail[(0, 0)] += 1
     for motion in head_motions:
+        step_size, head_x, head_y = 1, 0, 0  # init to avoid "possibly unbounded" lint checks
         match motion.split():
             case ["R", steps]:
-                for _ in range(int(steps)):
-                    cur_coords = propogate_motion(cur_coords, 1, 0)
-                    coord_map_tail[cur_coords[-1]] += 1
+                step_size, head_x, head_y = int(steps), 1, 0
             case ["L", steps]:
-                for _ in range(int(steps)):
-                    cur_coords = propogate_motion(cur_coords, -1, 0)
-                    coord_map_tail[cur_coords[-1]] += 1
+                step_size, head_x, head_y = int(steps), -1, 0
             case ["U", steps]:
-                for _ in range(int(steps)):
-                    cur_coords = propogate_motion(cur_coords, 0, 1)
-                    coord_map_tail[cur_coords[-1]] += 1
+                step_size, head_x, head_y = int(steps), 0, 1
             case ["D", steps]:
-                for _ in range(int(steps)):
-                    cur_coords = propogate_motion(cur_coords, 0, -1)
-                    coord_map_tail[cur_coords[-1]] += 1
-    return coord_map_tail
+                step_size, head_x, head_y = int(steps), 0, -1
+        for _ in range(step_size):
+            cur_coords = propogate_motion(cur_coords, head_x, head_y)
+            tail_seen.add(cur_coords[-1])
+    return tail_seen
 
 
 # Tests
 test_motions = open("inputs/day9_test.txt").read().split("\n\n")
+print(len(simulate_motion(test_motions[0].split("\n"))))
 assert len(simulate_motion(test_motions[0].split("\n"))) == 13
 assert len(simulate_motion(test_motions[1].split("\n"), num_knots=10)) == 36
 
