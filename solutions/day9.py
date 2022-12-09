@@ -25,6 +25,13 @@ def update_tail(new_H: Coord, T: Coord) -> Coord:
         return (T[0] + signum(new_H[0] - T[0]), T[1] + signum(new_H[1] - T[1]))
 
 
+def propogate_motion(coords: List[Coord], head_x: CoordUpdate, head_y: CoordUpdate) -> List[Coord]:
+    coords[0] = update_head(coords[0], head_x, head_y)
+    for k in range(1, len(coords)):
+        coords[k] = update_tail(coords[k - 1], coords[k])
+    return coords
+
+
 def simulate_motion(head_motions: List[str], num_knots: int = 2) -> CoordMap:
     coord_map_tail: CoordMap = defaultdict(int)
     cur_coords: List[Coord] = [(0, 0)] * num_knots
@@ -33,27 +40,19 @@ def simulate_motion(head_motions: List[str], num_knots: int = 2) -> CoordMap:
         match motion.split():
             case ["R", steps]:
                 for _ in range(int(steps)):
-                    cur_coords[0] = update_head(cur_coords[0], 1, 0)
-                    for k in range(1, num_knots):
-                        cur_coords[k] = update_tail(cur_coords[k - 1], cur_coords[k])
+                    cur_coords = propogate_motion(cur_coords, 1, 0)
                     coord_map_tail[cur_coords[-1]] += 1
             case ["L", steps]:
                 for _ in range(int(steps)):
-                    cur_coords[0] = update_head(cur_coords[0], -1, 0)
-                    for k in range(1, num_knots):
-                        cur_coords[k] = update_tail(cur_coords[k - 1], cur_coords[k])
+                    cur_coords = propogate_motion(cur_coords, -1, 0)
                     coord_map_tail[cur_coords[-1]] += 1
             case ["U", steps]:
                 for _ in range(int(steps)):
-                    cur_coords[0] = update_head(cur_coords[0], 0, 1)
-                    for k in range(1, num_knots):
-                        cur_coords[k] = update_tail(cur_coords[k - 1], cur_coords[k])
+                    cur_coords = propogate_motion(cur_coords, 0, 1)
                     coord_map_tail[cur_coords[-1]] += 1
             case ["D", steps]:
                 for _ in range(int(steps)):
-                    cur_coords[0] = update_head(cur_coords[0], 0, -1)
-                    for k in range(1, num_knots):
-                        cur_coords[k] = update_tail(cur_coords[k - 1], cur_coords[k])
+                    cur_coords = propogate_motion(cur_coords, 0, -1)
                     coord_map_tail[cur_coords[-1]] += 1
     return coord_map_tail
 
