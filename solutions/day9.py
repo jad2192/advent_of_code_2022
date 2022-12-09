@@ -19,7 +19,7 @@ def update_head(start: Coord, update_x: CoordUpdate, update_y: CoordUpdate) -> C
 def update_tail(new_H: Coord, T: Coord) -> Coord:
     if coords_touching(new_H, T):  # When touching after H moves, do nothing
         return (T[0], T[1])
-    else:  # Need to move T diagonally
+    else:
         return (T[0] + signum(new_H[0] - T[0]), T[1] + signum(new_H[1] - T[1]))
 
 
