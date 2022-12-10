@@ -1,5 +1,5 @@
 lint:
-	poetry run flake8 .
+	poetry run flake8 --max-line-length 120 --extend-ignore E203,E741 .
 	poetry run mypy .
 	poetry run isort -c .
 	poetry run black -l 120 --check --diff .

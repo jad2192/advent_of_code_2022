@@ -52,7 +52,7 @@ def get_directory_sizes_bfs(terminal_list: List[str]) -> List[int]:
         directory_sizes[file.path_str()] += file.size
     while not pqueue.empty():
         cur_priority, cur_obj = pqueue.get()
-        if cur_obj.parent != None and cur_obj.path_str() not in seen_obj:
+        if cur_obj.parent is not None and cur_obj.path_str() not in seen_obj:
             pqueue.put((cur_priority + 1, cur_obj.parent))
             directory_sizes[cur_obj.parent.path_str()] += directory_sizes[cur_obj.path_str()]
         seen_obj.add(cur_obj.path_str())

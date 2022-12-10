@@ -27,7 +27,7 @@ def get_visible_trees(tree_line: str) -> List[int]:
 
 def get_visible_tree_positions(tree_line_rows: List[str]) -> Set[Tuple[int, int]]:
     tree_line_cols = list("".join(t) for t in zip(*tree_line_rows))
-    visible_positions = set()
+    visible_positions: Set[Tuple[int, int]] = set()
     for k, tree_line in enumerate(tree_line_rows):
         visible_positions = visible_positions.union((k, ix) for ix in get_visible_trees(tree_line))
     for k, tree_line in enumerate(tree_line_cols):
@@ -58,8 +58,8 @@ def get_scenic_score(row_ix, col_ix, distance_dict_row: Dict, distance_dict_col:
 def get_max_scenic_score(tree_line_rows: List[str]) -> int:
     tree_line_cols = list("".join(t) for t in zip(*tree_line_rows))
     M, N = len(tree_line_rows[0]), len(tree_line_cols[0])
-    distance_dict_rows = defaultdict(dict)
-    distance_dict_cols = defaultdict(dict)
+    distance_dict_rows: DefaultDict = defaultdict(dict)
+    distance_dict_cols: DefaultDict = defaultdict(dict)
     scores = []
     for k in range(M):
         for j in range(N):

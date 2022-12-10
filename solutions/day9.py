@@ -1,7 +1,7 @@
-from typing import List, Literal, Set, Tuple, TypeAlias
+from typing import List, Set, Tuple, TypeAlias
 
 Coord: TypeAlias = Tuple[int, int]  # Coordinate class
-CoordUpdate: TypeAlias = Literal[-1, 0, 1]
+CoordUpdate: TypeAlias = int
 
 
 def signum(i: int) -> int:
