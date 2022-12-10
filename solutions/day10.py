@@ -16,22 +16,24 @@ def signal_strength(signal: List[int], start_cycle: int, cycle_step: int, cycles
     return sum([c_ix * signal[2 * c_ix] for c_ix in range(start_cycle, start_cycle + cycle_step * cycles, cycle_step)])
 
 
-def draw_pixels(program, pixel_width: int, pixel_height: int) -> None:
+def draw_pixels(program, pixel_width: int = 40, pixel_height: int = 6) -> None:
     signal = get_signal(program)
     pixel_sequence = ""
     for k in range(pixel_width * pixel_height):
-        next_char = "#" if (abs(signal[2 * k] - k) <= 1) else "."
+        next_char = "#" if (abs(signal[2 * k + 2] - (k % pixel_width)) <= 1) else "."
         pixel_sequence += next_char
-    for crt_row in pixel_sequence[0 : pixel_width : pixel_width * pixel_height]:
-        print(crt_row)
+    for k in range(0, pixel_width * pixel_height, pixel_width):
+        print(pixel_sequence[k : k + pixel_width])
 
 
 # Tests
 test_program = open("inputs/day10_test.txt").read().split("\n")
 assert get_signal(test_program)[40 : 40 + 80 * 6 : 80] == [21, 19, 18, 21, 16, 18]
 assert signal_strength(get_signal(test_program), 20, 40, 6) == 13140
-print()
+draw_pixels(test_program)
 
 
 program = open("inputs/day10.txt").read().split("\n")
 print("Part 1: ", signal_strength(get_signal(program), 20, 40, 6))
+print("Part 2: ")
+draw_pixels(program)
