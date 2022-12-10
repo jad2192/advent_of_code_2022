@@ -1,7 +1,9 @@
-from typing import List
+from typing import List, TypeAlias
+
+Program: TypeAlias = List[str]
 
 
-def get_signal(program: List[str]) -> List[int]:
+def get_signal(program: Program) -> List[int]:
     signal = [1, 1]  # Even indices indicate starting state of cycle, odd end state.
     for instruction in program:
         match instruction.split():
@@ -12,7 +14,8 @@ def get_signal(program: List[str]) -> List[int]:
     return signal
 
 
-def signal_strength(signal: List[int], start_cycle: int, cycle_step: int, cycles: int) -> int:
+def signal_strength(program: Program, start_cycle: int, cycle_step: int, cycles: int) -> int:
+    signal = get_signal(program)
     return sum([c_ix * signal[2 * c_ix] for c_ix in range(start_cycle, start_cycle + cycle_step * cycles, cycle_step)])
 
 
@@ -27,13 +30,13 @@ def draw_pixels(program, pixel_width: int = 40, pixel_height: int = 6) -> None:
 
 
 # Tests
-test_program = open("inputs/day10_test.txt").read().split("\n")
+test_program: Program = open("inputs/day10_test.txt").read().split("\n")
 assert get_signal(test_program)[40 : 40 + 80 * 6 : 80] == [21, 19, 18, 21, 16, 18]
-assert signal_strength(get_signal(test_program), 20, 40, 6) == 13140
+assert signal_strength(test_program, 20, 40, 6) == 13140
 draw_pixels(test_program)
 
 
-program = open("inputs/day10.txt").read().split("\n")
-print("Part 1: ", signal_strength(get_signal(program), 20, 40, 6))
+program: Program = open("inputs/day10.txt").read().split("\n")
+print("Part 1: ", signal_strength(program, 20, 40, 6))
 print("Part 2: ")
 draw_pixels(program)
