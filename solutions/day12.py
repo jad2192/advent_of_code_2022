@@ -1,7 +1,7 @@
 import math
 from collections import defaultdict
 from queue import PriorityQueue
-from typing import Dict, List, Optional, Tuple, TypeAlias
+from typing import Dict, List, Optional, Tuple, TypeAlias, Union
 
 Node: TypeAlias = Tuple[int, int]
 
@@ -24,16 +24,20 @@ class MountainGraph:
                     case let if let.islower():
                         self.nodes[(row_ix, col_ix)] = ord(height) - ord("a")
         self.ncols = len(input_rows[0])
-        self.dist = defaultdict(lambda: math.inf)  # Shortest path (distance) to source node (0, 0)
+        self.dist: Dict[Node, Union[float, int]] = defaultdict(
+            lambda: math.inf
+        )  # Shortest path (distance) to source node
         self.dist[self.start_node] = 0
 
     def update_dist(self, node: Node, new_dist: int):
         self.dist[node] = new_dist
 
-    def update_start_node(self, new_start: Node):
+    def update_start_node(self, new_start: Node, reverse_paths: bool = False):
         self.dist = defaultdict(lambda: math.inf)
         self.start_node = new_start
         self.dist[new_start] = 0
+        if reverse_paths:
+            self.nodes = {node: -height for node, height in self.nodes.items()}
 
     def neighbors(self, node: Node) -> List[Node]:
         neighbors = []
@@ -52,10 +56,10 @@ class MountainGraph:
         return neighbors
 
 
-def dijkstra_climb(mountain: MountainGraph, start_node: Optional[Node] = None) -> Dict:
+def dijkstra_climb(mountain: MountainGraph, start_node: Optional[Node] = None, descent: bool = False) -> Dict:
     if start_node is not None:
-        mountain.update_start_node(start_node)
-    pqueue = PriorityQueue()
+        mountain.update_start_node(start_node, reverse_paths=descent)
+    pqueue: PriorityQueue = PriorityQueue()
     pqueue.put((0, mountain.start_node))
     while not pqueue.empty():
         cur_d, cur_node = pqueue.get()
@@ -69,9 +73,9 @@ def dijkstra_climb(mountain: MountainGraph, start_node: Optional[Node] = None) -
 def shortest_max_height_climb(mountain: MountainGraph) -> int:
     start_points = [node for node, height in mountain.nodes.items() if height == 0]
     shortest = math.inf
+    path_dists = dijkstra_climb(mountain, start_node=mountain.end_node, descent=True)
     for node in start_points:
-        path_dists = dijkstra_climb(mountain, start_node=node)
-        shortest = min(shortest, path_dists[mountain.end_node])
+        shortest = min(shortest, path_dists[node])
     return int(shortest)
 
 
