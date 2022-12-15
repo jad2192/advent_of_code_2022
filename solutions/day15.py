@@ -45,12 +45,6 @@ class SensorGrid:
             self.grid[sensor_pos] = "S"
             self.grid[beacon_pos] = "B"
 
-    def fill_signal_ball(self, sensor_coord: Coord, beacon_coord: Coord):
-        D = l1_dist(sensor_coord, beacon_coord)
-        for x in range(-D, D + 1):
-            for y in range(abs(x) - D, D + 1 - abs(x)):
-                if self.grid[(x, y)] == ".":
-                    self.grid[(x, y)] = "#"
 
     def within_coverage(self, coord: Coord, sensor: Coord):
         assert sensor in self.sensors, f"{sensor} is not a valid sensor coordinate."
@@ -60,7 +54,7 @@ class SensorGrid:
         count = 0
         for x in range(int(self.xmin), int(self.xmax) + 1):
             for sensor in self.sensors:
-                if self.grid[(x, y_pos)] in {"S", "B"}:
+                if self.grid[(x, y_pos)] == "B":
                     break
                 elif self.within_coverage((x, y_pos), sensor):
                     count += 1
