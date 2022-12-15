@@ -1,7 +1,7 @@
 import math
 import re
 from collections import defaultdict
-from typing import Dict, List, Tuple, TypeAlias
+from typing import List, Tuple, TypeAlias
 
 Coord: TypeAlias = Tuple[int, int]
 ClosedInterval: TypeAlias = Tuple[int, int]
