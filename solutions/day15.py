@@ -1,4 +1,3 @@
-import math
 import re
 from collections import defaultdict
 from typing import List, Tuple, TypeAlias
@@ -15,16 +14,12 @@ def interval_union(intervals: List[ClosedInterval]) -> List[ClosedInterval]:
     if len(intervals) < 2:
         return intervals
     sorted_ints = sorted(intervals, key=lambda i: i[0])
-    res = [sorted_ints.pop(0)]
-    int1 = res[0]
-    while sorted_ints:
-        int2 = sorted_ints.pop(0)
-        if int2[0] <= int1[1] + 1:
-            int1 = (int1[0], max(int1[1], int2[1]))
-            res[-1] = int1
+    res = [sorted_ints[0]]
+    for intv in sorted_ints[1:]:
+        if intv[0] <= res[-1][1] + 1:
+            res[-1] = (res[-1][0], max(res[-1][1], intv[1]))
         else:
-            res.append(int2)
-            int1 = int2
+            res.append(intv)
     return res
 
 
