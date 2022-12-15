@@ -30,36 +30,23 @@ def interval_union(intervals: List[ClosedInterval]) -> List[ClosedInterval]:
 
 class SensorGrid:
     def __init__(self, sensor_positions: List[str]):
-        self.grid = defaultdict(lambda: ".")
         self.sensors = dict()
-        self.xmin = math.inf
-        self.xmax = -math.inf
+        self.beacons = defaultdict(set)
         for sensor_info in sensor_positions:
             x_pos = [int(v) for v in re.findall(r"x=(-?\d+)", sensor_info)]
             y_pos = [int(v) for v in re.findall(r"y=(-?\d+)", sensor_info)]
             sensor_pos = (x_pos[0], y_pos[0])
             beacon_pos = (x_pos[1], y_pos[1])
-            self.xmin = min(self.xmin, x_pos[0] - l1_dist(sensor_pos, beacon_pos))
-            self.xmax = max(self.xmax, x_pos[0] + l1_dist(sensor_pos, beacon_pos))
             self.sensors[sensor_pos] = l1_dist(sensor_pos, beacon_pos)
-            self.grid[sensor_pos] = "S"
-            self.grid[beacon_pos] = "B"
-
-
-    def within_coverage(self, coord: Coord, sensor: Coord):
-        assert sensor in self.sensors, f"{sensor} is not a valid sensor coordinate."
-        return l1_dist(coord, sensor) <= self.sensors[sensor]
+            self.beacons[y_pos[1]].add(beacon_pos)
 
     def count_impossible_beacon_coords(self, y_pos: int) -> int:
-        count = 0
-        for x in range(int(self.xmin), int(self.xmax) + 1):
-            for sensor in self.sensors:
-                if self.grid[(x, y_pos)] == "B":
-                    break
-                elif self.within_coverage((x, y_pos), sensor):
-                    count += 1
-                    break
-        return count
+        intervals = []
+        for sensor, D in self.sensors.items():
+            if sensor[1] - D <= y_pos <= sensor[1] + D:
+                dx = D - abs(sensor[1] - y_pos)
+                intervals.append((sensor[0] - dx, sensor[0] + dx))
+        return sum([(1 + intv[1] - intv[0]) for intv in interval_union(intervals)]) - len(self.beacons[y_pos])
 
     def get_signal_tuning_freq(self, max_xy: int) -> int:
         valid_sensors = [
