@@ -33,9 +33,6 @@ class AffineRelation:
     def det(self, l2: "AffineRelation") -> int:
         return self.A * l2.B - self.B * l2.A
 
-    def same_relation(self, l2: "AffineRelation") -> bool:
-        return (self.B / self.A == l2.B / l2.A) and (self.C / self.A == l2.C / l2.A)
-
     def intersection_point(self, l2: "AffineRelation") -> Optional[Coord]:
         det = self.det(l2)
         if det == 0:
